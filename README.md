@@ -121,7 +121,21 @@
 ---
 
 ## 프로젝트 구조
-├── static/ │ ├── images/ # 저장된 사진 및 이모지 아이콘 │ ├── css/ # 스타일 시트 파일 │ ├── js/ │ └── game.js # 게임 로직 ├── templates/ │ ├── start.html # 시작 화면 │ ├── index.html # 메인 화면 │ ├── save.html # 사진 저장 및 감정 표시 화면 │ ├── today.html # 일기 작성 화면 │ ├── list.html # 일기 목록 화면 │ └── game.html # 표정 게임 화면 ├── diaries.txt # 일기 저장 파일 └── app.py # Flask 애플리케이션
+<pre> 
+├── static/
+│   ├── images/               # 저장된 사진 및 이모지 아이콘
+│   ├── css/                  # 스타일 시트 파일
+│   ├── js/
+│       └── game.js           # 게임 로직
+├── templates/
+│   ├── start.html            # 시작 화면
+│   ├── index.html            # 메인 화면
+│   ├── save.html             # 사진 저장 및 감정 표시 화면
+│   ├── today.html            # 일기 작성 화면
+│   ├── list.html             # 일기 목록 화면
+│   └── game.html             # 표정 게임 화면
+├── diaries.txt               # 일기 저장 파일
+└── app.py                    # Flask 애플리케이션  </pre>
 
 
 ---
