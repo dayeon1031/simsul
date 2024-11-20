@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diary List</title>
+    <!-- 외부 스타일 시트 연결 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* 전체 body 스타일 설정 */
+        body {
+            font-family: Arial, sans-serif; /* 폰트 설정 */
+            margin: 0; /* 여백 제거 */
+            padding: 0; /* 패딩 제거 */
+            background-color: #f8f8f8; /* 배경색 설정 */
+            display: flex; /* 플렉스박스 사용 */
+            justify-content: center; /* 수평 중앙 정렬 */
+            align-items: center; /* 수직 중앙 정렬 */
+            flex-direction: column; /* 컬럼 방향으로 정렬 */
+        }
+
+        /* 일기 리스트 컨테이너 스타일 */
+        .diary-list {
+            width: 80%; /* 너비 설정 */
+            max-width: 600px; /* 최대 너비 설정 */
+            background-color: white; /* 배경색 흰색 */
+            border: 1px solid #ccc; /* 테두리 설정 */
+            border-radius: 10px; /* 둥근 모서리 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+            padding: 20px; /* 내부 여백 */
+            margin-top: 20px; /* 상단 여백 */
+        }
+
+        /* 제목 스타일 */
+        h1 {
+            text-align: center; /* 텍스트 중앙 정렬 */
+            color: #333; /* 텍스트 색상 */
+            margin-bottom: 20px; /* 하단 여백 */
+        }
+
+        /* 리스트 스타일 제거 */
+        ul {
+            list-style-type: none; /* 기본 리스트 스타일 제거 */
+            padding: 0; /* 패딩 제거 */
+        }
+
+        /* 리스트 아이템 스타일 */
+        li {
+            padding: 10px; /* 내부 여백 */
+            border-bottom: 1px solid #ccc; /* 하단 테두리 */
+            display: flex; /* 플렉스박스 사용 */
+            justify-content: space-between; /* 요소 간 간격 균등 */
+            align-items: center; /* 요소 수직 중앙 정렬 */
+        }
+
+        /* 마지막 리스트 아이템 하단 테두리 제거 */
+        li:last-child {
+            border-bottom: none;
+        }
+
+        /* 이모지 아이콘 스타일 */
+        .emoji {
+            width: 30px; /* 너비 설정 */
+            height: 30px; /* 높이 설정 */
+            margin-right: 10px; /* 오른쪽 여백 */
+        }
+
+        /* 푸터 스타일 */
+        .footer {
+            margin-top: 20px; /* 상단 여백 */
+            text-align: center; /* 텍스트 중앙 정렬 */
+        }
+
+        /* 푸터 링크 스타일 */
+        .footer a {
+            text-decoration: none; /* 밑줄 제거 */
+            color: #4682B4; /* 텍스트 색상 */
+            margin: 0 10px; /* 좌우 여백 */
+        }
+
+        /* 푸터 링크 호버 효과 */
+        .footer a:hover {
+            color: #87CEFA; /* 호버 시 텍스트 색상 변경 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 일기 리스트 컨테이너 -->
+    <div class="diary-list">
+        <!-- 제목 -->
+        <h1>Your Diaries</h1>
+        <ul>
+            <!-- 일기 항목을 반복하여 출력 -->
+            {% for diary in diaries %}
+                {% set parts = diary.split(' - ') %} <!-- 날짜와 내용 분리 -->
+                {% if parts|length == 2 and ':' in parts[1] %} <!-- 유효한 항목인지 확인 -->
+                    {% set date = parts[0] %} <!-- 날짜 부분 추출 -->
+                    {% set emoji_content = parts[1].split(':', 1) %} <!-- 감정과 내용 분리 -->
+                    {% set emoji = emoji_content[0].strip() %} <!-- 감정 추출 -->
+                    {% set content = emoji_content[1].strip() %} <!-- 내용 추출 -->
+
+                    <li>
+                        <!-- 감정에 따른 이모지 표시 -->
+                        {% if emoji == "기쁨" %}
+                            <img src="{{ url_for('static', filename='images/happy.png') }}" alt="Emoji" class="emoji">
+                        {% elif emoji == "당황" %}
+                            <img src="{{ url_for('static', filename='images/emb.png') }}" alt="Emoji" class="emoji">
+                        {% elif emoji == "슬픔" %}
+                            <img src="{{ url_for('static', filename='images/sad.png') }}" alt="Emoji" class="emoji">
+                        {% elif emoji == "화남" %}
+                            <img src="{{ url_for('static', filename='images/angry.png') }}" alt="Emoji" class="emoji">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/default.png') }}" alt="Emoji" class="emoji">
+                        {% endif %}
+                        <span>{{ date }}: {{ content }}</span> <!-- 날짜와 내용 표시 -->
+                    </li>
+                {% else %}
+                    <!-- 유효하지 않은 항목 처리 -->
+                    <li><span>Invalid entry: {{ diary }}</span></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- 하단 푸터 -->
+    <div class="footer">
+        <a href="{{ url_for('today') }}">새 일기</a> <!-- 새 일기 작성 페이지로 이동 -->
+        <a href="{{ url_for('game') }}">게임</a> <!-- 게임 페이지로 이동 -->
+    </div>
+</body>
+</html>

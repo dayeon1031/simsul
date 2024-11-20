@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Today's Diary</title>
+    <!-- 외부 스타일 시트 연결 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* 전체 body 스타일 설정 */
+        body {
+            font-family: Arial, sans-serif; /* 폰트 설정 */
+            margin: 0; /* 여백 제거 */
+            padding: 0; /* 패딩 제거 */
+            background-color: #f8f8f8; /* 배경색 설정 */
+            height: 100vh; /* 화면 높이를 뷰포트 전체로 설정 */
+            display: flex; /* 플렉스박스 사용 */
+            justify-content: center; /* 수평 중앙 정렬 */
+            align-items: center; /* 수직 중앙 정렬 */
+        }
+
+        /* 일기 작성 컨테이너 스타일 */
+        .diary-container {
+            position: relative; /* 상대 위치 설정 */
+            width: 100%; /* 너비 전체 */
+            height: 100%; /* 높이 전체 */
+            background-image: url('{{ url_for('static', filename='images/start_background.png') }}'); /* 배경 이미지 설정 */
+            background-size: cover; /* 배경 이미지 크기 조정 */
+            background-position: center; /* 배경 이미지 위치 조정 */
+        }
+
+        /* 이모지 아이콘 스타일 */
+        .emoji-icon {
+            position: absolute; /* 위치 절대 설정 */
+            top: 10%; /* 상단에서 10% 위치 */
+            left: 50%; /* 수평 중앙 */
+            transform: translateX(-50%); /* 수평 중앙 정렬 */
+            width: 80px; /* 아이콘 너비 */
+            height: auto; /* 높이 자동 조정 (비율 유지) */
+            max-height: 80px; /* 최대 높이 설정 */
+            border-radius: 50%; /* 둥근 모서리 */
+        }
+
+        /* 텍스트 입력창 스타일 */
+        textarea {
+            position: absolute; /* 위치 절대 설정 */
+            top: 40%; /* 화면의 40% 위치 */
+            left: 50%; /* 수평 중앙 */
+            transform: translate(-50%, -50%); /* 중앙 정렬 */
+            width: 50%; /* 너비 50% */
+            height: 30%; /* 높이 30% */
+            padding: 10px; /* 내부 여백 */
+            font-size: 16px; /* 폰트 크기 */
+            border: 1px solid #ccc; /* 테두리 색상 */
+            border-radius: 5px; /* 둥근 모서리 */
+            resize: none; /* 크기 조정 불가 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+        }
+
+        /* 저장 버튼 스타일 */
+        .save-button {
+            position: absolute; /* 위치 절대 설정 */
+            top: 61%; /* 화면의 61% 위치 */
+            left: 72%; /* 화면의 72% 위치 */
+            transform: translate(-50%, -50%); /* 중앙 정렬 */
+            padding: 5px 10px; /* 버튼 패딩 */
+            font-size: 12px; /* 버튼 텍스트 크기 */
+            background-color: #d3d3d3; /* 버튼 배경색 */
+            border: none; /* 테두리 없음 */
+            border-radius: 3px; /* 둥근 모서리 */
+            color: #333; /* 텍스트 색상 */
+            cursor: pointer; /* 커서 변경 */
+        }
+
+        /* 저장 버튼 호버 효과 */
+        .save-button:hover {
+            background-color: #b0b0b0; /* 호버 시 배경색 변경 */
+        }
+
+        /* 하단 고정 푸터 스타일 */
+        .footer {
+            position: fixed; /* 고정 위치 */
+            bottom: 0%; /* 화면 하단에 위치 */
+            width: 100%; /* 너비 전체 */
+            text-align: center; /* 중앙 정렬 */
+        }
+
+        /* 푸터 링크 스타일 */
+        .footer a {
+            margin: 0 10px; /* 링크 간 간격 */
+            text-decoration: none; /* 밑줄 제거 */
+            color: #4682B4; /* 링크 텍스트 색상 */
+            font-size: 18px; /* 텍스트 크기 */
+        }
+
+        /* 푸터 링크 호버 효과 */
+        .footer a:hover {
+            color: #87CEFA; /* 호버 시 텍스트 색상 변경 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 일기 작성 컨테이너 -->
+    <div class="diary-container">
+        <!-- 이모지 아이콘 표시 -->
+        <img 
+            src="{% if emoji == '기쁨' %}
+                    {{ url_for('static', filename='images/happy.png') }}
+                 {% elif emoji == '당황' %}
+                    {{ url_for('static', filename='images/emb.png') }}
+                 {% elif emoji == '슬픔' %}
+                    {{ url_for('static', filename='images/sad.png') }}
+                 {% elif emoji == '화남' %}
+                    {{ url_for('static', filename='images/angry.png') }}
+                 {% else %}
+                    {{ url_for('static', filename='images/default.png') }}
+                 {% endif %}" 
+            alt="Emoji" 
+            class="emoji-icon"
+        />
+        
+        <!-- 일기 작성 폼 -->
+        <form method="POST" action="{{ url_for('today') }}">
+            <textarea name="diary" placeholder="오늘 어떤 하루를 보냈나요?"></textarea> <!-- 일기 입력창 -->
+            <input type="hidden" name="emoji" value="{{ emoji }}"> <!-- 감정 데이터 숨김 입력 -->
+            <button type="submit" class="save-button">Save</button> <!-- 저장 버튼 -->
+        </form>
+    </div>
+    
+    <!-- 하단 푸터 -->
+    <div class="footer">
+        <a href="{{ url_for('list_diary') }}">일기 목록</a> <!-- 일기 목록 페이지로 이동 -->
+        <a href="{{ url_for('game') }}">표정 게임</a> <!-- 표정 게임 페이지로 이동 -->
+    </div>
+</body>
+</html>

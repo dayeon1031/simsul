@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saved Photo</title>
+    <!-- 외부 스타일 시트 연결 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* 전체 body 스타일 설정 */
+        body {
+            font-family: Arial, sans-serif; /* 폰트 설정 */
+            margin: 0; /* 여백 제거 */
+            padding: 0; /* 패딩 제거 */
+            background-color: #f8f8f8; /* 배경색 설정 */
+            height: 100vh; /* 화면 높이를 뷰포트 전체로 설정 */
+            display: flex; /* 플렉스박스 사용 */
+            justify-content: center; /* 수평 중앙 정렬 */
+            align-items: center; /* 수직 중앙 정렬 */
+        }
+
+        /* 사진 저장 화면 컨테이너 스타일 */
+        .photo-container {
+            position: relative; /* 상대 위치 설정 */
+            width: 100%; /* 너비 전체 */
+            height: 100%; /* 높이 전체 */
+            background-image: url('{{ url_for('static', filename='images/start_background.png') }}'); /* 배경 이미지 설정 */
+            background-size: cover; /* 배경 이미지 크기 조정 */
+            background-position: center; /* 배경 이미지 위치 조정 */
+        }
+
+        /* 제목 스타일 */
+        h1 {
+            position: absolute; /* 위치 절대 설정 */
+            top: 10%; /* 상단에서 10% 아래 위치 */
+            left: 50%; /* 수평 중앙 */
+            transform: translateX(-50%); /* 수평 중앙 정렬 */
+            font-size: 36px; /* 폰트 크기 설정 */
+            color: #333; /* 텍스트 색상 */
+        }
+
+        /* 메시지 스타일 */
+        .message {
+            position: absolute; /* 위치 절대 설정 */
+            top: 20%; /* 상단에서 20% 아래 위치 */
+            left: 50%; /* 수평 중앙 */
+            transform: translateX(-50%); /* 수평 중앙 정렬 */
+            font-size: 24px; /* 폰트 크기 설정 */
+            color: #4682B4; /* 텍스트 색상 */
+            text-align: center; /* 텍스트 중앙 정렬 */
+        }
+
+        /* 저장된 이미지 스타일 */
+        img {
+            position: absolute; /* 위치 절대 설정 */
+            top: 50%; /* 화면의 50% 위치 */
+            left: 50%; /* 수평 중앙 */
+            transform: translate(-50%, -50%); /* 중앙 정렬 */
+            width: 50%; /* 이미지 너비 50% */
+            border-radius: 10px; /* 둥근 모서리 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+        }
+
+        /* 다음 버튼 스타일 */
+        .next-button {
+            position: absolute; /* 위치 절대 설정 */
+            bottom: 10%; /* 하단에서 10% 위 */
+            left: 50%; /* 수평 중앙 */
+            transform: translateX(-50%); /* 중앙 정렬 */
+            padding: 15px 30px; /* 버튼 패딩 */
+            font-size: 20px; /* 버튼 텍스트 크기 */
+            background-color: #87CEFA; /* 버튼 배경색 */
+            border: none; /* 테두리 없음 */
+            border-radius: 5px; /* 둥근 모서리 */
+            color: white; /* 텍스트 색상 */
+            cursor: pointer; /* 커서 변경 */
+            text-decoration: none; /* 밑줄 제거 */
+        }
+
+        /* 다음 버튼 호버 효과 */
+        .next-button:hover {
+            background-color: #4682B4; /* 호버 시 배경색 변경 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 사진 저장 화면 컨테이너 -->
+    <div class="photo-container">
+        <!-- 제목 표시 -->
+        <h1>Photo Saved!</h1>
+        <!-- 감정 메시지 표시 -->
+        <div class="message">
+            {% if emotion == "화남" %}
+                화가 나는 하루셨군요.
+            {% elif emotion == "당황" %}
+                당황스러운 하루셨군요..
+            {% elif emotion == "기쁨" %}
+                기쁜 하루군요 ㅎㅎ
+            {% elif emotion == "슬픔" %}
+                슬픈 하루군요 ㅜㅜ
+            {% else %}
+                오늘 하루는 어땠나요?
+            {% endif %}
+        </div>
+        <!-- 저장된 사진 표시 -->
+        <img src="{{ url_for('static', filename='images/saved_photos/' + filename) }}" alt="Saved Photo">
+        <!-- 다음 페이지로 이동하는 폼 -->
+        <form method="GET" action="{{ url_for('today') }}">
+            <input type="hidden" name="emoji" value="{{ emotion }}"> <!-- 감정 데이터를 숨김 입력 -->
+            <button type="submit" class="next-button">Next</button> <!-- 다음 버튼 -->
+        </form>
+    </div>
+</body>
+</html>
