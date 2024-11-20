@@ -1,0 +1,56 @@
+/* 전체 body 스타일 설정 */
+body {
+    background-color: #f8f5f2; /* 배경색 설정 */
+    font-family: 'Arial', sans-serif; /* 폰트 설정 */
+    color: #333; /* 텍스트 색상 설정 */
+}
+
+/* 공통 컨테이너 스타일 설정 */
+.camera-container, .photo-container, .diary-container {
+    display: flex; /* 플렉스박스 사용 */
+    flex-direction: column; /* 세로 방향으로 정렬 */
+    align-items: center; /* 요소를 수평 중앙 정렬 */
+    margin-top: 20px; /* 상단 여백 */
+}
+
+/* 버튼 기본 스타일 설정 */
+button {
+    background-color: #d4c9b9; /* 버튼 배경색 설정 */
+    color: white; /* 버튼 텍스트 색상 설정 */
+    padding: 10px 20px; /* 버튼 내부 여백 */
+    border: none; /* 버튼 테두리 제거 */
+    border-radius: 5px; /* 둥근 모서리 설정 */
+    cursor: pointer; /* 마우스 포인터 변경 */
+}
+
+/* 버튼 호버 효과 */
+button:hover {
+    background-color: #b8a899; /* 호버 시 버튼 배경색 변경 */
+}
+
+/* 텍스트 입력창 스타일 설정 */
+textarea {
+    width: 80%; /* 너비 80% */
+    height: 200px; /* 높이 200px */
+    padding: 10px; /* 내부 여백 */
+    margin-top: 10px; /* 상단 여백 */
+    border: 1px solid #ccc; /* 테두리 설정 */
+    border-radius: 5px; /* 둥근 모서리 설정 */
+}
+
+/* 푸터 스타일 설정 */
+.footer {
+    position: fixed; /* 화면 하단에 고정 */
+    bottom: 0; /* 하단 위치 설정 */
+    width: 100%; /* 너비 100% */
+    background-color: #d4c9b9; /* 푸터 배경색 설정 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    padding: 10px; /* 내부 여백 */
+}
+
+/* 푸터 링크 스타일 설정 */
+.footer a {
+    color: white; /* 링크 텍스트 색상 */
+    margin: 0 15px; /* 링크 간격 */
+    text-decoration: none; /* 밑줄 제거 */
+}
