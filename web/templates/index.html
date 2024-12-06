@@ -1,128 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camera</title>
-    <!-- 외부 스타일 시트 연결 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        /* 전체 body 스타일 설정 */
-        body {
-            font-family: Arial, sans-serif; /* 폰트 설정 */
-            margin: 0; /* 여백 제거 */
-            padding: 0; /* 패딩 제거 */
-            background-color: #f8f8f8; /* 배경색 설정 */
-            height: 100vh; /* 화면 높이를 뷰포트 전체로 설정 */
-            display: flex; /* 플렉스박스 사용 */
-            justify-content: center; /* 수평 중앙 정렬 */
-            align-items: center; /* 수직 중앙 정렬 */
+        /* 전체 화면 스타일 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
         }
 
-        /* 카메라 화면 컨테이너 스타일 */
+        /* 16:9 비율을 유지하는 컨테이너 */
         .camera-container {
-            position: relative; /* 상대 위치 설정 */
-            width: 100%; /* 너비 전체 */
-            height: 100%; /* 높이 전체 */
-            background-image: url('{{ url_for('static', filename='images/start_background.png') }}'); /* 배경 이미지 설정 */
-            background-size: cover; /* 배경 이미지 크기 조정 */
-            background-position: center; /* 배경 이미지 위치 조정 */
+            position: relative;
+            width: 100vw; /* 뷰포트 너비 */
+            height: calc(100vw * 9 / 16); /* 16:9 비율 */
+            max-height: 100vh; /* 화면 높이를 초과하지 않도록 제한 */
+            margin: auto;
+            background-image: url('{{ url_for('static', filename='images/start_background.png') }}');
+            background-size: cover;
+            background-position: center;
         }
 
-        /* 비디오 화면 스타일 */
+        /* 비디오 화면 */
         video {
-            position: absolute; /* 위치 절대 설정 */
-            top: 30%; /* 화면 상단에서 30% 위치 */
-            left: 50%; /* 수평 중앙 */
-            transform: translate(-50%, -50%); /* 중앙 정렬 */
-            width: 60%; /* 너비 60% */
-            border-radius: 10px; /* 둥근 모서리 */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%; /* 비디오 너비 */
+            height: auto; /* 비율 유지 */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        /* 저장 버튼 스타일 */
+        /* 저장 버튼 */
         .save-button {
-            position: absolute; /* 위치 절대 설정 */
-            bottom: 50px; /* 화면 하단에서 50px 위 */
-            left: 50%; /* 수평 중앙 */
-            transform: translateX(-50%); /* 중앙 정렬 */
-            padding: 15px 30px; /* 버튼 패딩 */
-            font-size: 20px; /* 버튼 텍스트 크기 */
-            background-color: #87CEFA; /* 버튼 배경색 */
-            border: none; /* 테두리 없음 */
-            border-radius: 5px; /* 둥근 모서리 */
-            color: white; /* 텍스트 색상 */
-            cursor: pointer; /* 커서 변경 */
-            text-decoration: none; /* 밑줄 제거 */
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #87CEFA;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
         }
 
-        /* 저장 버튼 호버 효과 */
         .save-button:hover {
-            background-color: #4682B4; /* 호버 시 배경색 변경 */
+            background-color: #4682B4;
         }
     </style>
 </head>
 <body>
-    <!-- 카메라 화면 컨테이너 -->
     <div class="camera-container">
-        <!-- 실시간 비디오 스트림 표시 -->
         <video id="video" autoplay></video>
-        <!-- 저장 버튼 -->
         <button class="save-button" id="capture">Save</button>
     </div>
 
-    <!-- 사진 데이터를 서버로 전송하는 폼 -->
     <form id="photo-form" method="POST" action="/save" enctype="multipart/form-data">
-        <input type="hidden" name="photo" id="photo-input"> <!-- 숨겨진 입력 필드 -->
+        <input type="hidden" name="photo" id="photo-input">
     </form>
 
     <script>
-        // 비디오 및 캡처 버튼 요소 가져오기
         const video = document.getElementById('video');
         const captureBtn = document.getElementById('capture');
 
-        // 사용자 카메라 접근 요청
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
-                video.srcObject = stream; // 비디오 스트림 설정
+                video.srcObject = stream;
             })
-            .catch(err => console.error("Camera error:", err)); // 오류 처리
+            .catch(err => console.error("Camera error:", err));
 
-        // 캡처 버튼 클릭 시 이벤트 처리
         captureBtn.addEventListener('click', () => {
-            const canvas = document.createElement('canvas'); // 캔버스 생성
-            const context = canvas.getContext('2d'); // 2D 컨텍스트 가져오기
-            canvas.width = video.videoWidth; // 캔버스 너비 설정
-            canvas.height = video.videoHeight; // 캔버스 높이 설정
-            context.drawImage(video, 0, 0, canvas.width, canvas.height); // 비디오 이미지를 캔버스에 그리기
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // 캔버스를 Blob 형태로 변환
             canvas.toBlob(blob => {
                 if (!blob) {
                     console.error("Failed to create Blob.");
-                    return; // Blob 생성 실패 시 처리
+                    return;
                 }
 
-                const formData = new FormData(); // FormData 객체 생성
-                formData.append('photo', blob, 'photo.png'); // Blob을 FormData에 추가
+                const formData = new FormData();
+                formData.append('photo', blob, 'photo.png');
 
-                // 서버로 이미지 업로드 요청
                 fetch('/save', {
-                    method: 'POST', // POST 요청
-                    body: formData // FormData 전송
+                    method: 'POST',
+                    body: formData
                 })
                 .then(response => {
                     if (response.ok) {
-                        return response.text(); // 성공 시 HTML 응답 반환
+                        return response.text();
                     } else {
-                        throw new Error('Failed to upload photo.'); // 실패 시 오류 발생
+                        throw new Error('Failed to upload photo.');
                     }
                 })
                 .then(html => {
-                    document.open(); // 새로운 HTML 문서 열기
-                    document.write(html); // 서버 응답 내용 쓰기
-                    document.close(); // 문서 닫기
+                    document.open();
+                    document.write(html);
+                    document.close();
                 })
-                .catch(err => console.error("Error during fetch:", err)); // 요청 오류 처리
-            }, 'image/png'); // Blob 유형 설정
+                .catch(err => console.error("Error during fetch:", err));
+            }, 'image/png');
         });
     </script>
 </body>
