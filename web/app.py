@@ -1,87 +1,100 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Start Page</title>
-    <!-- 외부 스타일 시트 연결 -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        /* 전체 body 스타일 설정 */
-        body {
-            font-family: Arial, sans-serif; /* 폰트 설정 */
-            margin: 0; /* 여백 제거 */
-            padding: 0; /* 패딩 제거 */
-            background-color: #f8f8f8; /* 배경색 설정 */
-            height: 100vh; /* 전체 화면 높이 설정 */
-            display: flex; /* 플렉스박스로 중앙 정렬 */
-            justify-content: center; /* 수평 중앙 정렬 */
-            align-items: center; /* 수직 중앙 정렬 */
-        }
+from flask import Flask, render_template, request, redirect, url_for, session
+import os
+import random
+from datetime import datetime
 
-        /* 시작 화면 컨테이너 스타일 */
-        .start-container {
-            position: relative; /* 위치 설정을 위해 relative 사용 */
-            width: 100%; /* 화면 너비 전체 사용 */
-            height: 100%; /* 화면 높이 전체 사용 */
-            background-image: url('{{ url_for('static', filename='images/start_background.png') }}'); /* 배경 이미지 설정 */
-            background-size: cover; /* 배경 이미지 크기 조정 */
-            background-position: center; /* 배경 이미지 중앙 정렬 */
-        }
+# Flask 애플리케이션 초기화
+app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # 세션을 사용하기 위한 비밀 키 설정
 
-        /* 제목 스타일 */
-        h1 {
-            position: absolute; /* 위치 절대 설정 */
-            top: 30px; /* 상단에서 30px 아래 위치 */
-            left: 50%; /* 화면의 수평 중앙 */
-            transform: translateX(-50%); /* 수평 중앙 정렬 */
-            font-size: 39px; /* 텍스트 크기 증가 */
-            margin: 0; /* 여백 제거 */
-            text-align: center; /* 텍스트 중앙 정렬 */
-            line-height: 1.2; /* 줄 간격 조정 */
-        }
+# 파일 저장 경로 설정
+UPLOAD_FOLDER = 'static/images/saved_photos'  # 업로드된 사진을 저장할 폴더
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # 폴더가 없으면 생성
 
-        /* 설명 문구 스타일 */
-        p {
-            position: absolute; /* 위치 절대 설정 */
-            top: 150px; /* 상단에서 150px 아래 위치 */
-            left: 50%; /* 화면의 수평 중앙 */
-            transform: translateX(-50%); /* 수평 중앙 정렬 */
-            font-size: 20px; /* 텍스트 크기 설정 */
-            color: #666; /* 텍스트 색상 설정 */
-            text-align: center; /* 텍스트 중앙 정렬 */
-            line-height: 1.6; /* 줄 간격 조정 */
-        }
+# 일기 저장 파일 설정
+DIARY_FILE = 'diaries.txt'  # 일기를 저장할 텍스트 파일
 
-        /* 시작 버튼 스타일 */
-        .start-button {
-            position: absolute; /* 위치 절대 설정 */
-            top: 50%; /* 화면의 수직 중앙 */
-            left: 50%; /* 화면의 수평 중앙 */
-            transform: translate(-50%, -50%); /* 중앙 정렬 */
-            padding: 15px 30px; /* 버튼 패딩 */
-            font-size: 20px; /* 버튼 텍스트 크기 */
-            background-color: #87CEFA; /* 버튼 배경색 */
-            border: none; /* 버튼 테두리 제거 */
-            border-radius: 5px; /* 버튼 둥근 모서리 */
-            color: white; /* 버튼 텍스트 색상 */
-            cursor: pointer; /* 커서 모양 설정 */
-            text-decoration: none; /* 링크 밑줄 제거 */
-        }
+# 표정 목록
+expressions = ["화남", "당황", "기쁨", "슬픔"]  # 임의로 선택될 감정 표현
 
-        /* 시작 버튼 호버 효과 */
-        .start-button:hover {
-            background-color: #4682B4; /* 버튼 호버 시 배경색 변경 */
-        }
-    </style>
-</head>
-<body>
-    <!-- 시작 화면 컨테이너 -->
-    <div class="start-container">
-        <!-- 제목 -->
-        <h1>당신의 하루는<br>어땠나요?</h1>
-        <!-- 설명 문구 -->
-        <p>오늘도, 내일도 당신처럼<br>빛나는 하루가 계속 되길.</p>
-        <!-- 시작 버튼 -->
-        <a href="{{ url_for('index') }}" class="start-button">START</a>
-    </div>
-</body>
-</html>
+# 루트 경로로 접근 시 /start로 리다이렉트
+@app.route('/')
+def redirect_to_start():
+    return redirect(url_for('start'))
+
+# 시작 화면
+@app.route('/start')
+def start():
+    return render_template('start.html')
+
+# 메인 화면
+@app.route('/index')
+def index():
+    return render_template('index.html')
+
+# 사진 업로드 및 저장
+@app.route('/save', methods=['POST'])
+def save():
+    # 업로드된 파일 확인
+    if 'photo' not in request.files or request.files['photo'].filename == '':
+        print("No photo uploaded!")
+        return "No photo uploaded!", 400  # 업로드된 파일이 없으면 에러 반환
+
+    photo = request.files['photo']  # 업로드된 파일 가져오기
+    filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"  # 파일 이름에 시간 추가
+    filepath = os.path.join(UPLOAD_FOLDER, filename)  # 저장 경로 설정
+
+    try:
+        photo.save(filepath)  # 파일 저장
+        print(f"Photo saved at: {filepath}")
+    except Exception as e:
+        print(f"Failed to save photo: {e}")
+        return "Failed to save photo!", 500  # 저장 실패 시 에러 반환
+
+    # 임의로 표정 선택
+    emotion = random.choice(expressions)
+    session['last_emotion'] = emotion  # 세션에 표정 저장
+    print(f"Selected emotion: {emotion}")
+
+    return render_template('save.html', filename=filename, emotion=emotion)
+
+# 오늘의 일기 작성
+@app.route('/today', methods=['GET', 'POST'])
+def today():
+    if request.method == 'POST':  # POST 요청으로 일기 저장
+        diary_text = request.form.get('diary')  # 일기 내용 가져오기
+        emoji = request.form.get('emoji', session.get('last_emotion', 'default.png'))  # 표정 가져오기
+        date = datetime.now().strftime('%Y-%m-%d')  # 오늘 날짜
+
+        with open(DIARY_FILE, 'a') as f:  # 일기를 파일에 추가
+            f.write(f"{date} - {emoji}: {diary_text}\n")
+
+        return redirect(url_for('list_diary'))  # 일기 목록으로 리다이렉트
+
+    emoji = session.get('last_emotion', 'default.png')  # 세션에서 마지막 감정 가져오기
+    return render_template('today.html', emoji=emoji)  # 일기 작성 화면 렌더링
+
+# 일기 목록
+@app.route('/list')
+def list_diary():
+    diaries = []  # 일기 목록 초기화
+    if os.path.exists(DIARY_FILE):  # 일기 파일 존재 여부 확인
+        with open(DIARY_FILE, 'r') as f:
+            diaries = f.readlines()  # 파일에서 일기 읽기
+
+        # 일기가 10개를 초과하면 오래된 일기 삭제
+        if len(diaries) > 10:
+            diaries = diaries[-10:]  # 최근 10개만 유지
+            with open(DIARY_FILE, 'w') as f:
+                f.writelines(diaries)  # 수정된 일기 목록 저장
+
+    return render_template('list.html', diaries=diaries)  # 일기 목록 화면 렌더링
+
+# 게임 화면
+@app.route('/game')
+def game():
+    return render_template('game.html')
+
+# 애플리케이션 실행
+if __name__ == '__main__':
+    app.run(debug=True)  # 디버그 모드로 실행
