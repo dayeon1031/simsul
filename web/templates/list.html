@@ -107,6 +107,8 @@
                             <img src="{{ url_for('static', filename='images/sad.png') }}" alt="Emoji" class="emoji">
                         {% elif emoji == "화남" %}
                             <img src="{{ url_for('static', filename='images/angry.png') }}" alt="Emoji" class="emoji">
+                        {% elif emoji == "평범" %}
+                            <img src="{{ url_for('static', filename='images/neutral.png') }}" alt="Emoji" class="emoji">
                         {% else %}
                             <img src="{{ url_for('static', filename='images/default.png') }}" alt="Emoji" class="emoji">
                         {% endif %}
