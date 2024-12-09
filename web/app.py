@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import os
 import random
 from datetime import datetime
+from keras.models import load_model
+import cv2
+import numpy as np
 
 # Flask 애플리케이션 초기화
 app = Flask(__name__)
@@ -14,8 +17,12 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # 폴더가 없으면 생성
 # 일기 저장 파일 설정
 DIARY_FILE = 'diaries.txt'  # 일기를 저장할 텍스트 파일
 
-# 표정 목록
-expressions = ["화남", "당황", "기쁨", "슬픔"]  # 임의로 선택될 감정 표현
+# RT 모델 로드
+MODEL_PATH = 'path_to_your_model.h5'  # 모델 파일 경로
+model = load_model(MODEL_PATH)
+
+# 표정 레이블 정의
+expressions = ["화남", "당황", "기쁨", "슬픔"]
 
 # 루트 경로로 접근 시 /start로 리다이렉트
 @app.route('/')
@@ -51,10 +58,24 @@ def save():
         print(f"Failed to save photo: {e}")
         return "Failed to save photo!", 500  # 저장 실패 시 에러 반환
 
-    # 임의로 표정 선택
-    emotion = random.choice(expressions)
+    # 이미지를 RT 모델 입력 형식으로 전처리
+    try:
+        img = cv2.imread(filepath)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(img, (48, 48))  # 모델 입력 크기에 맞게 조정
+        img = img / 255.0  # 정규화
+        img = np.expand_dims(img, axis=0)  # 배치 차원 추가
+
+        # 모델을 사용하여 감정 예측
+        predictions = model.predict(img)
+        emotion_index = np.argmax(predictions)  # 가장 높은 확률의 감정 인덱스
+        emotion = expressions[emotion_index]
+    except Exception as e:
+        print(f"Emotion prediction failed: {e}")
+        emotion = "알 수 없음"  # 예측 실패 시 기본값
+
     session['last_emotion'] = emotion  # 세션에 표정 저장
-    print(f"Selected emotion: {emotion}")
+    print(f"Predicted emotion: {emotion}")
 
     return render_template('save.html', filename=filename, emotion=emotion)
 
