@@ -102,15 +102,15 @@
     <div class="diary-container">
         <!-- 이모지 아이콘 표시 -->
         <img 
-            src="{% if emoji == '기쁨' %}
+            src="{% if emoji == 'happy' %}
                     {{ url_for('static', filename='images/happy.png') }}
-                 {% elif emoji == '당황' %}
+                 {% elif emoji == 'surprise' %}
                     {{ url_for('static', filename='images/emb.png') }}
-                 {% elif emoji == '슬픔' %}
+                 {% elif emoji == 'sad' %}
                     {{ url_for('static', filename='images/sad.png') }}
-                 {% elif emoji == '화남' %}
+                 {% elif emoji == 'angry' %}
                     {{ url_for('static', filename='images/angry.png') }}
-                {% elif emoji == '평범' %}
+                {% elif emoji == 'neutral' %}
                     {{ url_for('static', filename='images/neutral.png') }}
                  {% else %}
                     {{ url_for('static', filename='images/default.png') }}
