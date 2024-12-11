@@ -50,12 +50,13 @@ def process_and_predict_emotion(image_path):
     if len(faces) == 0:
         raise ValueError("No face detected in the image.")
 
-    # Process the first detected face (you can modify to process multiple faces if needed)
+    # Process the first detected face
     x, y, w, h = faces[0]
     face_region = frame[y:y+h, x:x+w]
 
     # Save the cropped face image
-    face_image_path = os.path.join(UPLOAD_FOLDER, f"face_{os.path.basename(image_path)}")
+    face_filename = f"face_{os.path.basename(image_path)}"
+    face_image_path = os.path.join(UPLOAD_FOLDER, face_filename)
     cv2.imwrite(face_image_path, face_region)
 
     # Predict emotion using YOLO model
@@ -67,17 +68,8 @@ def process_and_predict_emotion(image_path):
         emotion = "Unknown"
 
     return emotion, face_image_path
-# YOLO 추론 함수
-def predict_emotion(image_path):
-    """
-    YOLO 모델을 사용하여 이미지에서 감정을 예측하는 함수
-    """
-    frame = cv2.imread(image_path)
-    results = model.predict(source=frame, show=False)
-    if results[0].boxes:
-        class_idx = int(results[0].boxes[0].cls[0])  # 첫 번째 감정 결과 가져오기
-        return emotion_labels[class_idx]
-    return "Unknown"
+
+
 
 # 루트 경로 접근 시 시작 화면으로 리다이렉트
 @app.route('/')
@@ -115,11 +107,12 @@ def save():
     try:
         # 얼굴만 잘라서 감정 분석
         emotion, face_image_path = process_and_predict_emotion(filepath)
+        face_filename = os.path.basename(face_image_path)  # 파일 이름만 추출
         session['last_emotion'] = emotion
     except Exception as e:
         return f"Error processing image: {e}", 500
 
-    return render_template('save.html', filename=face_image_path, emotion=emotion)
+    return render_template('save.html', filename=face_filename, emotion=emotion)
 
 # 오늘의 일기 작성
 @app.route('/today', methods=['GET', 'POST'])
