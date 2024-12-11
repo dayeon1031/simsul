@@ -94,16 +94,17 @@ def today():
     오늘의 일기를 작성하고 저장하거나, 작성 화면을 반환하는 함수
     """
     if request.method == 'POST':
-        diary_text = request.form.get('diary')
-        emoji = request.form.get('emoji', session.get('last_emotion', '평범'))
-        date = datetime.now().strftime('%Y-%m-%d')
+        diary_text = request.form.get('diary')  # 사용자가 작성한 일기 내용
+        emoji = session.get('last_emotion', 'neutral')  # 세션에서 마지막 감정 (영어 레이블)
+        date = datetime.now().strftime('%Y-%m-%d')  # 현재 날짜
 
+        # 다이어리 파일에 영어 감정을 저장
         with open(DIARY_FILE, 'a') as f:
             f.write(f"{date} - {emoji}: {diary_text}\n")
 
         return redirect(url_for('list_diary'))
 
-    emoji = session.get('last_emotion', '평범')
+    emoji = session.get('last_emotion', 'neutral')  # 기본값을 영어 감정으로 설정
     return render_template('today.html', emoji=emoji)
 
 # 일기 목록
