@@ -177,10 +177,11 @@ def evaluate_expression():
         photo.save(filepath)
         # 얼굴만 자르고 감정을 예측
         emotion, face_image_path = process_and_predict_emotion(filepath)
+        korean_emotion = custom_labels.get(emotion, "알 수 없음")  # 한글로 변환
     except Exception as e:
         return {"error": str(e)}, 500
 
-    return {"userExpression": emotion, "faceImage": os.path.basename(face_image_path)}, 200
+    return {"userExpression": korean_emotion, "faceImage": os.path.basename(face_image_path)}, 200
 
 # 애플리케이션 실행
 if __name__ == '__main__':
