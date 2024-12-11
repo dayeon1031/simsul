@@ -160,6 +160,28 @@ def game():
     """
     return render_template('game.html')
 
+# 표정 평가 엔드포인트
+@app.route('/evaluate_expression', methods=['POST'])
+def evaluate_expression():
+    """
+    사용자가 업로드한 사진을 YOLO 모델로 분석하여 표정을 반환하는 엔드포인트
+    """
+    if 'photo' not in request.files or request.files['photo'].filename == '':
+        return {"error": "No photo uploaded!"}, 400
+
+    photo = request.files['photo']
+    filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+
+    try:
+        photo.save(filepath)
+        # 얼굴만 자르고 감정을 예측
+        emotion, face_image_path = process_and_predict_emotion(filepath)
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+    return {"userExpression": emotion, "faceImage": os.path.basename(face_image_path)}, 200
+
 # 애플리케이션 실행
 if __name__ == '__main__':
     app.run(debug=True)
