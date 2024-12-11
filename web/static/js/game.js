@@ -41,13 +41,29 @@ function takePhoto() {
     canvas.height = video.videoHeight; // 캔버스 높이 설정
     context.drawImage(video, 0, 0, canvas.width, canvas.height); // 비디오 이미지를 캔버스에 그리기
 
-    console.log("Photo captured! (Simulated)"); // 캡처된 이미지 로직 (서버 전송 추가 가능)
+    // 캡처된 이미지를 서버로 전송 (예제)
+    canvas.toBlob(blob => {
+        const formData = new FormData();
+        formData.append('photo', blob, 'captured_photo.png');
+
+        fetch('/evaluate_expression', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const userExpression = data.userExpression; // 서버에서 받은 사용자 표정
+            evaluateResult(userExpression);
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    console.log("Photo captured and sent to server!");
 }
 
-// 표정 평가 함수
-function evaluateExpression(expectedExpression) {
-    // 실제로는 사용자 표정을 분석하는 AI 모델 호출 로직 추가 가능
-    const userExpression = "기쁨"; // 현재는 하드코딩된 값, 실제로는 AI 모델의 결과를 사용
+// 표정 평가 결과 처리 함수
+function evaluateResult(userExpression) {
+    const expectedExpression = document.getElementById('expression').innerText.split(': ')[1]; // 예상 표정 가져오기
     let resultMessage = ''; // 결과 메시지 변수
 
     // 사용자 표정이 예상 표정과 일치하는지 확인
@@ -64,3 +80,6 @@ function evaluateExpression(expectedExpression) {
     document.getElementById('result').innerText = resultMessage; // 결과 메시지 출력
     document.getElementById('score').innerText = `Score: ${score}`; // 점수 출력
 }
+
+// 초기화된 점수 출력
+document.getElementById('score').innerText = `Score: ${score}`;
