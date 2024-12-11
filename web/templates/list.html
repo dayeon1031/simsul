@@ -99,15 +99,15 @@
 
                     <li>
                         <!-- 감정에 따른 이모지 표시 -->
-                        {% if emoji == "기쁨" %}
+                        {% if emoji == "happy" %}
                             <img src="{{ url_for('static', filename='images/happy.png') }}" alt="Emoji" class="emoji">
-                        {% elif emoji == "당황" %}
+                        {% elif emoji == "surprise" %}
                             <img src="{{ url_for('static', filename='images/emb.png') }}" alt="Emoji" class="emoji">
-                        {% elif emoji == "슬픔" %}
+                        {% elif emoji == "sad" %}
                             <img src="{{ url_for('static', filename='images/sad.png') }}" alt="Emoji" class="emoji">
-                        {% elif emoji == "화남" %}
+                        {% elif emoji == "angry" %}
                             <img src="{{ url_for('static', filename='images/angry.png') }}" alt="Emoji" class="emoji">
-                        {% elif emoji == "평범" %}
+                        {% elif emoji == "neutral" %}
                             <img src="{{ url_for('static', filename='images/neutral.png') }}" alt="Emoji" class="emoji">
                         {% else %}
                             <img src="{{ url_for('static', filename='images/default.png') }}" alt="Emoji" class="emoji">
