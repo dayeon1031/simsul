@@ -32,7 +32,41 @@ custom_labels = {
     'sad': "슬픔",
     'surprise': "당황"
 }
+# 얼굴 추출 및 감정 분석
+def process_and_predict_emotion(image_path):
+    """
+    얼굴을 추출한 후 감정을 예측하는 함수
+    """
+    # Load Haar Cascade for face detection
+    face_cascade = cv2.CascadeClassifier('/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml')
 
+    # Read and process the image
+    frame = cv2.imread(image_path)
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Detect faces in the image
+    faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+    if len(faces) == 0:
+        raise ValueError("No face detected in the image.")
+
+    # Process the first detected face (you can modify to process multiple faces if needed)
+    x, y, w, h = faces[0]
+    face_region = frame[y:y+h, x:x+w]
+
+    # Save the cropped face image
+    face_image_path = os.path.join(UPLOAD_FOLDER, f"face_{os.path.basename(image_path)}")
+    cv2.imwrite(face_image_path, face_region)
+
+    # Predict emotion using YOLO model
+    results = model.predict(source=face_region, show=False)
+    if results[0].boxes:
+        class_idx = int(results[0].boxes[0].cls[0])
+        emotion = emotion_labels[class_idx]
+    else:
+        emotion = "Unknown"
+
+    return emotion, face_image_path
 # YOLO 추론 함수
 def predict_emotion(image_path):
     """
@@ -79,13 +113,13 @@ def save():
         return f"Failed to save photo: {e}", 500
 
     try:
-        original_emotion = predict_emotion(filepath)
-        emotion = custom_labels.get(original_emotion, "알 수 없음")
+        # 얼굴만 잘라서 감정 분석
+        emotion, face_image_path = process_and_predict_emotion(filepath)
+        session['last_emotion'] = emotion
     except Exception as e:
-        emotion = "알 수 없음"
+        return f"Error processing image: {e}", 500
 
-    session['last_emotion'] = emotion  # 세션에 예측된 감정 저장
-    return render_template('save.html', filename=filename, emotion=emotion)
+    return render_template('save.html', filename=face_image_path, emotion=emotion)
 
 # 오늘의 일기 작성
 @app.route('/today', methods=['GET', 'POST'])
