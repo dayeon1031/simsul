@@ -30,7 +30,7 @@ custom_labels = {
     'happy': "기쁨",
     'neutral': "평범",
     'sad': "슬픔",
-    'surprise': "당황"
+    'surprise': "놀람"
 }
 # 얼굴 추출 및 감정 분석
 def process_and_predict_emotion(image_path):
