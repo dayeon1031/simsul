@@ -26,7 +26,7 @@ emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surpri
 custom_labels = {
     'angry': "화남",
     'disgust': "역겨움",
-    'fear': "당황",
+    'fear': "공포",
     'happy': "기쁨",
     'neutral': "평범",
     'sad': "슬픔",
