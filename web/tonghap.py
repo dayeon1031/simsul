@@ -25,7 +25,7 @@ emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surpri
 # 사용자 정의 레이블 매핑 (한글)
 custom_labels = {
     'angry': "화남",
-    'disgust': "화남",
+    'disgust': "역겨움",
     'fear': "당황",
     'happy': "기쁨",
     'neutral': "평범",
