@@ -1,5 +1,5 @@
 // 표정 배열 초기화
-let expressions = ["기쁨", "당황", "화남", "슬픔", "평범"]; // 게임에서 사용할 표정 목록
+let expressions = ["기쁨", "놀람", "화남", "슬픔", "평범"]; // 게임에서 사용할 표정 목록
 let score = 0; // 점수 초기화
 let video = document.getElementById('video'); // HTML 비디오 요소 가져오기
 
